@@ -1,0 +1,86 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #121212;
+  color: #fff;
+}
+
+/* 🧊 Card appearance */
+.glass-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+}
+
+/* ⚙️ Slot grid — 5 per row, total 10 */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+  margin: 0 auto;
+  max-width: 900px;
+}
+
+/* 🅿️ Individual slot styling */
+.slot {
+  background: #1e1e1e;
+  padding: 12px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.slot:hover {
+  transform: scale(1.03);
+}
+
+/* ✅ Available */
+.slot.available {
+  border-color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
+}
+
+/* ❌ Occupied */
+.slot.occupied {
+  border-color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+/* 🔤 Slot info */
+.slot-icon {
+  font-size: 26px;
+  margin-bottom: 6px;
+  color: #ccc;
+}
+
+.slot-number {
+  font-weight: bold;
+  color: #eee;
+}
+
+.slot-occupied-info {
+  font-size: 0.9em;
+  color: #aaa;
+}
+
+/* 🧾 Title labels */
+.card-title, .navbar-brand, h5, h6, .text-info, .text-warning {
+  color: #fff !important;
+}
+
+/* 🚨 Flash messages */
+.alert {
+  border-radius: 10px;
+  padding: 10px 16px;
+}
+
+/* 🔍 Modal styling */
+.modal-content {
+  background: #1a1a1a;
+  color: #eee;
+  border: none;
+}

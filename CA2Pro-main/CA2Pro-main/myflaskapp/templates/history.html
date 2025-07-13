@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Parking History - Vehicle Parking Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-dark text-light">
+  <div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h3 class="text-white">Parking History</h3>
+      <a href="{{ url_for('index') }}" class="btn btn-outline-light">⬅ Back to Dashboard</a>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }} mb-3">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% if vehicles %}
+    <div class="table-responsive">
+      <table class="table table-dark table-bordered text-center align-middle">
+        <thead class="table-secondary text-dark">
+          <tr>
+            <th>Owner</th>
+            <th>Vehicle</th>
+            <th>Type</th>
+            <th>Slot</th>
+            <th>Entry</th>
+            <th>Exit</th>
+            <th>Duration</th>
+            <th>Fee (€)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for v in vehicles %}
+          <tr>
+            <td>{{ v.owner_name }}</td>
+            <td>{{ v.vehicle_number }}</td>
+            <td>{{ v.vehicle_type }}</td>
+            <td>{{ v.slot_number }}</td>
+            <td>{{ v.entry_time_formatted }}</td>
+            <td>{{ v.exit_time_formatted }}</td>
+            <td>{{ v.duration }}</td>
+            <td class="text-success">{{ v.parking_fee }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+      <p class="text-center text-muted">No parking history found.</p>
+    {% endif %}
+  </div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Verify MFA Code - Smart Parking</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-dark text-light container py-4 text-center">
+  <h2 class="text-warning mb-4">🔐 Enter 6-Digit Code</h2>
+  <p>Open your authenticator app and enter the current code shown</p>
+
+  <form method="POST" class="w-50 mx-auto mt-3">
+    <input type="text" name="otp" class="form-control text-center mb-3" placeholder="Enter code" required>
+    <button type="submit" class="btn btn-success">🔓 Verify & Continue</button>
+  </form>
+</body>
+</html>

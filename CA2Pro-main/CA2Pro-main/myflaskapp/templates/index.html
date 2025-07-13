@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Vehicle Parking Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-dark text-light">
+  <div class="text-end p-3">
+    <a href="{{ url_for('logout') }}" class="btn btn-sm btn-outline-light">Logout 🔒</a>
+  </div>
+
+  <nav class="navbar navbar-dark bg-black shadow px-4 mb-4 rounded-bottom justify-content-between">
+    <span class="navbar-brand fs-3">Vehicle Parking Tracker</span>
+    <a href="{{ url_for('history') }}" class="btn btn-outline-info">📜 View History</a>
+  </nav>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, msg in messages %}
+          <div class="alert alert-{{ category }} mb-3">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- ✅ Park Vehicle Form -->
+    <div class="card glass-card mb-4 shadow-lg border-0">
+      <div class="card-body">
+        <h5 class="card-title mb-4 text-white">Add Vehicle</h5>
+        <form method="POST" class="row g-3">
+          <div class="col-md-3"><input type="text" name="owner" class="form-control" placeholder="Owner Name" required></div>
+          <div class="col-md-3"><input type="text" name="vnumber" class="form-control" placeholder="Vehicle Number" required></div>
+          <div class="col-md-3"><input type="text" name="vtype" class="form-control" placeholder="Vehicle Type" required></div>
+          <div class="col-md-2"><input type="number" name="slot" class="form-control" min="1" max="{{ total_parking_slots }}" placeholder="Slot #" required></div>
+          <div class="col-md-1 text-end"><button class="btn btn-success">Park 🚗</button></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- 🔍 Search Field -->
+    <form method="GET" action="/" class="mb-4">
+      <div class="input-group">
+        <input type="text" name="search" class="form-control" placeholder="Search owner or vehicle..." value="{{ search_query }}">
+        <button class="btn btn-info">Search 🔍</button>
+        <a href="/" class="btn btn-secondary">Clear</a>
+      </div>
+    </form>
+
+    <!-- 📊 Stats Overview -->
+    <div class="text-center mb-3">
+      <span class="badge bg-light text-dark me-2">Total Slots: {{ total_parking_slots }}</span>
+      <span class="badge bg-success me-2">Available: {{ available_slots }}</span>
+      <span class="badge bg-danger">Occupied: {{ parked_vehicles_count }}</span>
+    </div>
+
+    <div class="card glass-card shadow-sm border-0 mb-4">
+      <div class="card-body">
+        <div class="row text-center">
+          <div class="col-md-4"><h6 class="text-white">Total Revenue</h6><h5 class="text-success">€{{ total_income }}</h5></div>
+          <div class="col-md-4"><h6 class="text-white">Vehicles Exited</h6><h5 class="text-warning">{{ exited_count }}</h5></div>
+          <div class="col-md-4"><h6 class="text-white">Currently Parked</h6><h5 class="text-info">{{ parked_vehicles_count }}</h5></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🅿️ Parking Floor -->
+    <h5 class="mb-3 text-white">Parking Floor</h5>
+    <div class="grid mb-5">
+      {% for i in range(1, total_parking_slots + 1) %}
+        {% set sid = i|string %}
+        {% set v = slots.get(sid) %}
+        {% if v %}
+          <div class="slot occupied"
+               data-bs-toggle="modal" data-bs-target="#vehicleDetailsModal"
+               data-owner="{{ v.owner_name }}"
+               data-vnumber="{{ v.vehicle_number }}"
+               data-vtype="{{ v.vehicle_type }}"
+               data-slot="{{ v.slot_number }}"
+               data-entry="{{ v.entry_time }}"
+               data-id="{{ v._id }}">
+            <span class="slot-number">Slot {{ sid }}</span>
+            <i class="fas fa-car slot-icon"></i>
+            <span class="slot-occupied-info">{{ v.vehicle_number }}</span>
+          </div>
+        {% else %}
+          <div class="slot available"
+               onclick="alert('Slot {{ sid }} is available. Use the form above to park a vehicle.')">
+            <span class="slot-number">Slot {{ sid }}</span>
+            <i class="fas fa-parking slot-icon"></i>
+            <span class="slot-occupied-info">Available</span>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 🚘 Modal: Show Match on Search -->
+  <div class="modal fade" id="vehicleDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-light">
+        <div class="modal-header border-light">
+          <h5 class="modal-title">Vehicle Details</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Owner:</strong> <span id="modalOwnerName"></span></p>
+          <p><strong>Vehicle:</strong> <span id="modalVehicleNumber"></span></p>
+          <p><strong>Type:</strong> <span id="modalVehicleType"></span></p>
+          <p><strong>Slot:</strong> <span id="modalSlotNumber"></span></p>
+          <p><strong>Entry:</strong> <span id="modalEntryTime"></span></p>
+        </div>
+        <div class="modal-footer">
+          <a href="#" id="modalExitButton" class="btn btn-danger">Exit Vehicle</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📜 Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const modal = document.getElementById('vehicleDetailsModal');
+    modal.addEventListener('show.bs.modal', function (event) {
+      const btn = event.relatedTarget;
+      document.getElementById('modalOwnerName').textContent = btn.getAttribute('data-owner');
+      document.getElementById('modalVehicleNumber').textContent = btn.getAttribute('data-vnumber');
+      document.getElementById('modalVehicleType').textContent = btn.getAttribute('data-vtype');
+      document.getElementById('modalSlotNumber').textContent = btn.getAttribute('data-slot');
+      document.getElementById('modalEntryTime').textContent = btn.getAttribute('data-entry');
+      document.getElementById('modalExitButton').href = `/exit/${btn.getAttribute('data-id')}`;
+    });
+  </script>
+</body>
+</html>
